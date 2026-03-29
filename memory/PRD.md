@@ -1,54 +1,31 @@
 # DROPSHOT - Tennis Video Analytics App
 
 ## Problem Statement
-Build a tennis video analytics app where users upload max 30s tennis clips and receive AI-powered analytics (shot detection, ball tracking, player movement, speed estimation) plus an annotated output video with overlays.
+Build a tennis video analytics app where users upload max 30s tennis clips and receive AI-powered analytics (shot detection, ball tracking, player movement, speed estimation) plus an annotated output video with overlays. Uses Tennis-Vision pipeline (YOLO-based detection) + Claude Opus 4.6 AI.
 
 ## Architecture
-- **Frontend**: React + TailwindCSS + Shadcn UI + Recharts + Phosphor Icons
-- **Backend**: FastAPI + OpenCV + GPT-5.2 Vision + Object Storage + MongoDB
-- **Processing Pipeline**: Upload → Compress → OpenCV Analysis → GPT Enhancement → Annotated Video → Storage
+- **Frontend**: React 18 + TailwindCSS + Shadcn/UI + Recharts + Phosphor Icons
+- **Backend**: FastAPI + Tennis-Vision (YOLOv8 + ResNet-50) + Claude Opus 4.6 + Object Storage + MongoDB
+- **Pipeline**: Upload > Compress > YOLOv8 Player Detection > Custom YOLO Ball Detection > ResNet-50 Court Keypoints > Mini-Court > Shot Classification > Claude Opus 4.6 > H.264 Video
 
-## What's Been Implemented (March 29, 2026)
-- Full video upload with drag-and-drop (MP4, MOV, AVI, WebM)
-- OpenCV-based ball tracking, player detection, motion analysis, speed estimation
-- GPT-5.2 Vision supplementary analysis (shot types, player assessment, tactical notes)
-- H.264 annotated output video with ball trails, player boxes, shot detection overlays
-- Production hardening: rate limiting, video compression, retry logic, processing queue (max 3), pagination, validation
-- DROPSHOT branding with Outfit/Manrope fonts, volt green (#CEFF00) dark theme
-- Dashboard with 4 tabs: Overview, Shots, Tracking, Video
-- Recharts visualizations: radar chart, pie chart, area charts, bar charts
-- History page with pagination
-- Retry failed analyses
-- Health check endpoint
+## Implemented (March 29, 2026)
+- Full Tennis-Vision pipeline (YOLOv8s player, custom YOLO ball, ResNet-50 court)
+- Claude Opus 4.6 AI expert tennis commentary
+- H.264 output video with ball trails, player boxes, court keypoints, mini-court
+- Production: rate limiting, compression, retry logic, queue, pagination, validation
+- DROPSHOT branding, 4-tab dashboard, Recharts charts, history with pagination
+- Detailed GitHub README with architecture diagram
 
-## User Personas
-- Tennis players wanting swing analysis
-- Coaches reviewing player footage
-- Tennis enthusiasts analyzing pro clips
+## Models
+| Model | Size | Purpose |
+|-------|------|---------|
+| yolov8s.pt | ~22 MB | Player detection |
+| last.pt | 165 MB | Custom ball detection |
+| keypoints_model.pth | 91 MB | Court keypoint detection |
 
-## Prioritized Backlog
-### P0 (Critical)
-- [x] Video upload and processing
-- [x] OpenCV analysis pipeline
-- [x] AI-enhanced analysis
-- [x] Output video with overlays
-- [x] Analytics dashboard
-
-### P1 (Important)
-- [ ] User authentication (login/signup)
-- [ ] Share analysis via link
-- [ ] Side-by-side video comparison
-- [ ] PDF report export
-
-### P2 (Nice to have)
-- [ ] Multi-video batch upload
-- [ ] Training progress tracking over time
-- [ ] Court heatmap visualization
-- [ ] Social sharing (Twitter/Instagram cards)
-- [ ] Mobile-optimized video capture
-
-## Next Action Items
-1. Add user auth to isolate analyses per user
-2. Implement shareable public links for analyses
-3. Add PDF/report export for coaching sessions
-4. Side-by-side comparison of two clips
+## Next Actions
+1. User authentication
+2. Shareable analysis links
+3. GPU acceleration for faster processing
+4. PDF report export
+5. Side-by-side comparison
