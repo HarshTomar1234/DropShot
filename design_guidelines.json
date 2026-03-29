@@ -1,0 +1,117 @@
+{
+  "theme": "dark",
+  "archetype": "2 - The Performance Pro",
+  "domain": "Sports, Video Analytics, Performance",
+  "description": "A high-energy, command-center dashboard for tennis video analytics. Features deep obsidian backgrounds, sharp technical grids, and Volt Green accents inspired by the iconic tennis ball, emphasizing elite athleticism and data precision.",
+  "colors": {
+    "background": "#0A0A0A",
+    "surface": "#121212",
+    "surface_elevated": "#1A1A1A",
+    "border": "#2A2A2A",
+    "primary": "#CEFF00",
+    "primary_hover": "#B3E600",
+    "secondary": "#FFFFFF",
+    "text_primary": "#FFFFFF",
+    "text_secondary": "#A1A1AA",
+    "accent_danger": "#FF3B30",
+    "accent_info": "#007AFF",
+    "glow_primary": "rgba(206, 255, 0, 0.15)"
+  },
+  "typography": {
+    "fonts": {
+      "heading": "Outfit, sans-serif",
+      "body": "Manrope, sans-serif",
+      "mono": "JetBrains Mono, monospace"
+    },
+    "scale": {
+      "h1": "text-4xl sm:text-5xl lg:text-6xl tracking-tighter font-black",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl tracking-tight font-bold",
+      "h3": "text-xl sm:text-2xl tracking-tight font-semibold",
+      "h4": "text-lg sm:text-xl font-medium",
+      "body": "text-base font-normal leading-relaxed",
+      "small": "text-sm font-medium",
+      "overline": "text-xs tracking-[0.2em] uppercase font-bold text-text_secondary"
+    },
+    "rules": {
+      "anti_default": "Avoid Inter/Roboto for headings. Use Outfit for a modern athletic feel.",
+      "typesetting": "Headlines must use tracking-tighter. Overlines must be uppercase with wide spacing."
+    }
+  },
+  "layout": {
+    "grid_strategy": "Control Room Protocol",
+    "spacing": "Dense and compact. Use p-4 to p-6 for widgets.",
+    "radius": "Sharp or max 8px (rounded-none or rounded-md).",
+    "structure": {
+      "columns": "grid-cols-1 md:grid-cols-3 lg:grid-cols-4",
+      "gap": "gap-4 md:gap-6"
+    },
+    "surfaces": {
+      "cards": "Flat solid background (bg-[#121212]), 1px solid border (border-[#2A2A2A]), no soft shadows. Tactical minimalism.",
+      "glass": "Rarely used. If needed for sticky elements, use bg-[#0A0A0A]/80 backdrop-blur-xl border-b border-[#2A2A2A].",
+      "hover_state": "-translate-y-1, border-[#CEFF00]/50 transition-all duration-200"
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-[#CEFF00] text-[#0A0A0A] font-bold hover:bg-[#B3E600] rounded-none px-6 py-3 transition-colors",
+      "secondary": "bg-transparent border border-[#2A2A2A] text-white hover:border-[#CEFF00] hover:text-[#CEFF00] rounded-none px-6 py-3 transition-colors"
+    },
+    "inputs": {
+      "style": "bg-[#121212] border border-[#2A2A2A] text-white focus:border-[#CEFF00] focus:ring-1 focus:ring-[#CEFF00] rounded-none placeholder-[#A1A1AA]"
+    },
+    "video_player": {
+      "wrapper": "relative w-full aspect-video bg-black border border-[#2A2A2A] overflow-hidden rounded-md",
+      "overlays": "Use absolute positioning with Volt Green (#CEFF00) for ball tracking arcs, bounding boxes, and stats."
+    },
+    "charts": {
+      "type": "Use Shadcn charts / Recharts.",
+      "colors": ["#CEFF00", "#FFFFFF", "#007AFF", "#FF3B30"],
+      "styling": "Stroke width 2, no fill under lines unless using a strict gradient to transparent."
+    },
+    "icons": {
+      "library": "@phosphor-icons/react",
+      "style": "Regular or Fill depending on active state. Sharp, technical."
+    }
+  },
+  "motion": {
+    "philosophy": "Minimalist, tactile, and responsive. Feedback on interaction, no unnecessary bouncy animations.",
+    "transitions": "transition-all duration-200 ease-out",
+    "loading": "Use sharp, linear progress bars in Volt Green (#CEFF00), not spinners."
+  },
+  "media": {
+    "urls": [
+      {
+        "category": "hero_background",
+        "url": "https://images.pexels.com/photos/34247896/pexels-photo-34247896.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Aerial night view of a lit urban tennis court surrounded by dark buildings. Great for an atmospheric landing/login background."
+      },
+      {
+        "category": "video_placeholder",
+        "url": "https://images.pexels.com/photos/1103830/pexels-photo-1103830.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Captivating shot of a male tennis player in motion. Use as a fallback or placeholder for the main video player."
+      },
+      {
+        "category": "ambient_texture",
+        "url": "https://images.pexels.com/photos/9633550/pexels-photo-9633550.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "A dimly lit outdoor tennis court at night with an umpire chair and tennis net."
+      },
+      {
+        "category": "accent_image",
+        "url": "https://images.unsplash.com/photo-1628977087856-8d26d761f1b2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjd8MHwxfHNlYXJjaHwzfHx0ZW5uaXMlMjBjb3VydCUyMGRhcmslMjBuaWdodHxlbnwwfHx8fDE3NzQ3ODA1NDB8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Yellow tennis ball on brown floor. Use for empty states or specialized data blocks."
+      }
+    ]
+  },
+  "testing": {
+    "data_testid": "MANDATORY. All interactive elements must have data-testid (e.g., data-testid='upload-video-button')."
+  },
+  "instructions_to_main_agent": [
+    "Use 'Outfit' for headings and 'Manrope' for body text. Do not use Inter or default generic fonts.",
+    "Rely heavily on the 'Control Room' bento grid protocol for the dashboard: grid-cols-1 md:grid-cols-3 lg:grid-cols-4 with gap-4 or gap-6.",
+    "Make the primary CTA and active states use #CEFF00 (Volt Green) for high contrast against the #0A0A0A background.",
+    "Card components should use flat solid backgrounds (#121212) with a 1px solid border (#2A2A2A). Do not use soft shadows.",
+    "Implement the Video Player as the Hero element of the dashboard layout, surrounded by stats and heatmaps.",
+    "Include a prominent drag & drop upload zone with a linear progress bar.",
+    "Do not use placeholder image services like via.placeholder.com. Use the provided media URLs."
+  ]
+}
