@@ -450,7 +450,7 @@ Return JSON only:
     "summary": "2-3 sentence analysis"
 }
 Only valid JSON, no markdown."""
-        ).with_model("openai", "gpt-5.2")
+        ).with_model("anthropic", "claude-opus-4-6")
 
         image_contents = []
         for idx, (frame_num, frame) in enumerate(frames[:4]):
@@ -493,6 +493,8 @@ async def process_video_task(analysis_id: str):
 async def _run_processing(analysis_id: str):
     tmp_files = []
     try:
+        from tennis_vision_pipeline import run_tennis_vision_pipeline
+
         doc = await db.analyses.find_one({"id": analysis_id}, {"_id": 0})
         if not doc:
             return
@@ -511,63 +513,58 @@ async def _run_processing(analysis_id: str):
         compressed_path = compress_video(tmp_input.name)
         if compressed_path != tmp_input.name:
             tmp_files.append(compressed_path)
-        await db.analyses.update_one({"id": analysis_id}, {"$set": {"processing_progress": 20}})
+        await db.analyses.update_one({"id": analysis_id}, {"$set": {"processing_progress": 15}})
 
-        # 3. Validate & extract metadata
+        # 3. Validate
         video_info = validate_video(compressed_path)
-        frames, frame_info = extract_key_frames(compressed_path, num_frames=5)
         await db.analyses.update_one({"id": analysis_id}, {"$set": {
-            "processing_progress": 25,
+            "processing_progress": 20,
             "duration_sec": video_info["duration"],
             "total_frames": video_info["total_frames"],
             "fps": video_info["fps"],
             "resolution": f"{video_info['width']}x{video_info['height']}"
         }})
 
-        # 4. Core OpenCV analysis (primary source of truth)
-        cv_analysis = analyze_motion(compressed_path)
-        await db.analyses.update_one({"id": analysis_id}, {"$set": {"processing_progress": 50}})
-
-        # 5. AI enhancement (supplementary — degrades gracefully)
-        ai_result = await analyze_with_gpt(frames, video_info, cv_analysis)
-        await db.analyses.update_one({"id": analysis_id}, {"$set": {"processing_progress": 65}})
-
-        # 6. Generate annotated output video
+        # 4. Run Tennis-Vision pipeline (YOLO detection, court keypoints, mini court, shot classification)
         tmp_output = tempfile.NamedTemporaryFile(suffix=".mp4", delete=False)
         tmp_output.close()
         tmp_files.append(tmp_output.name)
-        generate_annotated_video(compressed_path, tmp_output.name, cv_analysis)
+
+        await db.analyses.update_one({"id": analysis_id}, {"$set": {"processing_progress": 25}})
+
+        # Run pipeline synchronously in executor to not block event loop
+        loop = asyncio.get_event_loop()
+        tv_analytics = await loop.run_in_executor(
+            None, run_tennis_vision_pipeline, compressed_path, tmp_output.name
+        )
+
+        await db.analyses.update_one({"id": analysis_id}, {"$set": {"processing_progress": 75}})
+
+        # 5. AI enhancement with Claude Opus 4.6 (supplements YOLO data)
+        frames, frame_info = extract_key_frames(compressed_path, num_frames=4)
+        cv_stats = {
+            "total_ball_detections": tv_analytics.get("ball_tracking", {}).get("total_detections", 0),
+            "total_player_detections": tv_analytics.get("player_stats", {}).get("total_movement_detections", 0),
+            "avg_motion": tv_analytics.get("player_stats", {}).get("avg_motion_level", 0),
+            "court_coverage_pct": tv_analytics.get("player_stats", {}).get("court_coverage_pct", 0),
+        }
+        ai_result = await analyze_with_gpt(frames, video_info, cv_stats)
         await db.analyses.update_one({"id": analysis_id}, {"$set": {"processing_progress": 85}})
 
-        # 7. Upload output video
+        # 6. Upload output video
         with open(tmp_output.name, "rb") as f:
             output_data = f.read()
         output_path = f"{APP_NAME}/output/{analysis_id}/annotated.mp4"
         put_object_with_retry(output_path, output_data, "video/mp4")
         await db.analyses.update_one({"id": analysis_id}, {"$set": {"processing_progress": 92}})
 
-        # 8. Compile results — CV data is primary, AI enriches
-        ball_tracking = {
-            "total_detections": cv_analysis["total_ball_detections"],
-            "positions": cv_analysis["ball_positions"][:50],
-            "trajectory_points": len(cv_analysis["ball_positions"]),
-            "speeds": cv_analysis["ball_speeds"][:30],
-        }
+        # 7. Compile results — Tennis-Vision YOLO data + Claude AI enrichment
+        ball_tracking = tv_analytics.get("ball_tracking", {})
+        player_stats = tv_analytics.get("player_stats", {})
+        speed_metrics = tv_analytics.get("speed_metrics", {})
+        shot_analysis = tv_analytics.get("shot_analysis", [])
 
-        player_stats = {
-            "total_movement_detections": cv_analysis["total_player_detections"],
-            "avg_motion_level": cv_analysis["avg_motion"],
-            "max_motion_level": cv_analysis["max_motion"],
-            "peak_activity_frames": [p["frame"] for p in cv_analysis["peak_activity_frames"][:5]],
-            "court_coverage_pct": cv_analysis["court_coverage_pct"],
-        }
-
-        speed_metrics = {
-            "motion_intensity_score": min(100, int(cv_analysis["avg_motion"] / 1000)),
-            "shot_moments_detected": len(cv_analysis["shot_moments"]),
-        }
-
-        # Merge AI data if available
+        # Merge AI interpretation if available
         if ai_result:
             player_stats.update({
                 "stance": ai_result.get("player_assessment", {}).get("stance", ""),
@@ -581,21 +578,24 @@ async def _run_processing(analysis_id: str):
                 "player_movement_intensity": ai_result.get("speed_estimates", {}).get("player_movement_intensity", ""),
                 "rally_tempo": ai_result.get("speed_estimates", {}).get("rally_tempo", ""),
             })
+            # AI shot analysis supplements YOLO-based detection
+            if ai_result.get("shot_analysis") and not shot_analysis:
+                shot_analysis = ai_result["shot_analysis"]
 
         await db.analyses.update_one({"id": analysis_id}, {"$set": {
             "status": "completed",
             "processing_progress": 100,
-            "shot_analysis": ai_result.get("shot_analysis", []) if ai_result else cv_analysis["shot_moments"][:10],
+            "shot_analysis": shot_analysis,
             "player_stats": player_stats,
             "ball_tracking": ball_tracking,
             "speed_metrics": speed_metrics,
             "tactical_analysis": ai_result.get("tactical_analysis", {}) if ai_result else {},
-            "ai_summary": ai_result.get("summary", "") if ai_result else f"OpenCV detected {cv_analysis['total_ball_detections']} ball positions, {cv_analysis['total_player_detections']} player movements, {len(cv_analysis['shot_moments'])} shot moments across {video_info['duration']:.1f}s of footage.",
+            "ai_summary": ai_result.get("summary", "") if ai_result else f"Tennis-Vision detected {ball_tracking.get('total_detections',0)} ball positions and {len(shot_analysis)} shots across {video_info['duration']:.1f}s.",
             "output_video_path": output_path,
             "completed_at": datetime.now(timezone.utc).isoformat()
         }})
 
-        logger.info(f"Analysis {analysis_id} completed successfully")
+        logger.info(f"Analysis {analysis_id} completed with Tennis-Vision pipeline")
 
     except HTTPException:
         await db.analyses.update_one({"id": analysis_id}, {"$set": {"status": "failed", "error": "Video validation failed"}})

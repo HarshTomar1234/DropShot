@@ -99,3 +99,8 @@ frontend/node_modules/.cache/default-development/1.pack
 # Environment files
 *.env
 *.env.*
+frontend/node_modules/.cache/default-development/3.pack
+backend/Tennis-Vision/models/keypoints_model.pth
+backend/Tennis-Vision/models/best.pt
+backend/Tennis-Vision/models/last.pt
+backend/yolov8x.pt

@@ -107,7 +107,7 @@ export default function DashboardPage() {
             Analyzing Your Clip
           </h2>
           <p className="text-sm mb-8" style={{ color: 'var(--text-secondary)' }}>
-            {analysis.original_filename} — OpenCV + AI processing your footage
+            {analysis.original_filename} — YOLO + ResNet-50 + Claude Opus 4.6 processing
           </p>
           <div className="w-full max-w-md mx-auto mb-3">
             <Progress value={progress} className="h-2" />

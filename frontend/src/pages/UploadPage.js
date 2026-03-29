@@ -219,7 +219,7 @@ export default function UploadPage() {
           style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}
         >
           <Info size={14} />
-          Processing takes 30-60 seconds depending on video length. Your clip is analyzed with OpenCV computer vision + GPT-5.2 AI.
+          Processing takes 2-5 minutes depending on video length (YOLO runs on CPU). Your clip is analyzed with YOLOv8 + ResNet-50 computer vision + Claude Opus 4.6 AI.
         </div>
       </div>
 
