@@ -1,34 +1,88 @@
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+/* Tennis Video Analytics Styles */
+
+.upload-zone {
+  border: 2px dashed var(--border-color);
+  transition: all 0.2s ease-out;
+  background: var(--bg-surface);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+.upload-zone:hover,
+.upload-zone.drag-over {
+  border-color: var(--volt-green);
+  background: rgba(206, 255, 0, 0.03);
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+.upload-zone.drag-over {
+  box-shadow: inset 0 0 30px rgba(206, 255, 0, 0.08);
 }
 
-.App-link {
-    color: #61dafb;
+/* Progress bar */
+.progress-bar {
+  height: 4px;
+  background: var(--border-color);
+  overflow: hidden;
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+.progress-bar-fill {
+  height: 100%;
+  background: var(--volt-green);
+  transition: width 0.3s ease-out;
+}
+
+/* Video player */
+.video-container {
+  position: relative;
+  background: #000;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+/* Stat card */
+.stat-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  padding: 1.25rem;
+  transition: all 0.2s ease-out;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(206, 255, 0, 0.5);
+}
+
+.stat-value {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  color: var(--volt-green);
+}
+
+/* Chart container */
+.chart-container {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  padding: 1.25rem;
+}
+
+/* Stagger animation */
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
+.stagger-5 { animation-delay: 0.25s; }
+.stagger-6 { animation-delay: 0.3s; }
+
+/* Overline text */
+.overline {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+/* Glass nav */
+.glass-nav {
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-color);
 }
