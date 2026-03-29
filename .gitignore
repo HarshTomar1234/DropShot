@@ -104,3 +104,7 @@ backend/Tennis-Vision/models/keypoints_model.pth
 backend/Tennis-Vision/models/best.pt
 backend/Tennis-Vision/models/last.pt
 backend/yolov8x.pt
+-e 
+# Environment files
+*.env
+*.env.*
